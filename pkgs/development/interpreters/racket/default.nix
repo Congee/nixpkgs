@@ -78,6 +78,13 @@ stdenv.mkDerivation rec {
     # fail to detect its variant at runtime.
     # See: https://github.com/NixOS/nixpkgs/issues/114993#issuecomment-812951247
     ./force-cs-variant.patch
+
+    # The entry point binary $out/bin/racket is codesigned at least once. The
+    # following error is triggered as a result.
+    # (error 'add-ad-hoc-signature "file already has a signature")
+    # We always remove the existing signature then call add-ad-hoc-signature to
+    # circumvent this error.
+    ./force-remove-codesign-then-add.patch
   ];
 
   preConfigure = ''
@@ -119,6 +126,6 @@ stdenv.mkDerivation rec {
     homepage = "https://racket-lang.org/";
     license = with licenses; [ asl20 /* or */ mit ];
     maintainers = with maintainers; [ kkallio henrytill vrthra ];
-    platforms = [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
+    platforms = [ "x86_64-darwin" "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
   };
 }
